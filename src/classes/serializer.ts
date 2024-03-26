@@ -36,6 +36,7 @@ export default class Serializer<PrimaryType extends Dictionary<any> = any> {
     projection: null,
     linkers: {},
     metaizers: {},
+    fields: {},
   };
 
   /**
@@ -118,7 +119,13 @@ export default class Serializer<PrimaryType extends Dictionary<any> = any> {
   ) {
     // Get options
     if (options === undefined || helpers === undefined) {
+      const fields = options?.fields;
       options = this.options;
+
+      if (fields) {
+        options.fields = fields;
+      }
+
       helpers = this.helpers;
     }
     if (!options.idKey) {
@@ -153,6 +160,24 @@ export default class Serializer<PrimaryType extends Dictionary<any> = any> {
         })
       );
       resourceOptions.relationships = relationships;
+    }
+
+    if (options.fields?.[type]) {
+      if (resourceOptions.attributes) {
+        Object.keys(resourceOptions.attributes).forEach((key) => {
+          if (!options?.fields?.[type].includes(key)) {
+            delete resourceOptions.attributes?.[key];
+          }
+        });
+      }
+
+      if (resourceOptions.relationships) {
+        Object.keys(resourceOptions.relationships).forEach((key) => {
+          if (!options?.fields?.[type].includes(key)) {
+            delete resourceOptions.relationships?.[key];
+          }
+        });
+      }
     }
 
     // Handling links
@@ -309,7 +334,7 @@ export default class Serializer<PrimaryType extends Dictionary<any> = any> {
     const include = o.include || o.depth;
     if (relators && include) {
       document.included = (document.included || []).concat(
-        await recurseRelators(dto, relators, include, keys, relatorDataCache)
+        await recurseRelators(dto, relators, include, keys, o.fields, relatorDataCache)
       );
     }
 

@@ -7,6 +7,7 @@ export async function recurseRelators(
   relators: Record<string, Relator<any>>,
   include: number | string[] | undefined,
   keys: string[],
+  fields: Record<string, string[]> | undefined,
   relatorDataCache?: Map<Relator<any>, Dictionary<any>[]>
 ) {
   const included: any[] = [];
@@ -56,7 +57,7 @@ export async function recurseRelators(
 
         const resource = await relator.getRelatedResource(
           cache[i],
-          undefined,
+          fields ? { fields } : undefined,
           undefined,
           // Only build the cache for the next iteration if needed.
           shouldBuildRelatedCache ? newRelatorDataCache : undefined

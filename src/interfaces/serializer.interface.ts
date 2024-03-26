@@ -165,4 +165,12 @@ export interface SerializerOptions<PrimaryType extends Dictionary<any> = any> {
      */
     resource?: Metaizer<[PrimaryType]>;
   };
+
+  /**
+   * An object with an array per resource type with the names of the
+   * [fields to be returned](https://jsonapi.org/format/#fetching-sparse-fieldsets).
+   *
+   * @defaultValue `{}`
+   */
+  fields: Record<string, string[]>;
 }
